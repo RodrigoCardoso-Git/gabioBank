@@ -93,6 +93,9 @@ export class ServerComunicador {
                 if (!to_account_id) {
                     return new GBTPResult('ERROR', 'Conta de destino não informada', account.saldo);
                 }
+                if (to_account_id === account_id) {
+                    return new GBTPResult('ERROR', 'Conta de origem e destino não podem ser a mesma', account.saldo);
+                }
                 const toAcc = this.repositorio.find(to_account_id);
                 if (!toAcc) {
                     return new GBTPResult('ERROR', 'Conta de destino inexistente', account.saldo);
