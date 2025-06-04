@@ -13,7 +13,7 @@ Este projeto é um exemplo educacional para a disciplina de Redes de Computadore
 ## ✅ Estrutura do Projeto
 
 ```
-/gbtp-server       # Projeto do servidor (Node.js com TypeScript)
+/gabio-server       # Projeto do servidor (Node.js com TypeScript)
 README.md          # Documentação do projeto
 ```
 
@@ -114,7 +114,7 @@ npm run build
 npm start
 ```
 
-O servidor será iniciado e aguardará conexões WebSocket na porta padrão configurada no código (8080).
+O servidor será iniciado e aguardará conexões WebSocket na porta padrão configurada no código **(8080)**.
 
 ## ✅ Como Testar
 
