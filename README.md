@@ -1,7 +1,7 @@
 
 # Banco em Rede com Protocolo GBTP
 
-Este projeto é um exemplo educacional para a disciplina de Redes de Computadores, demonstrando a implementação de um sistema bancário em rede no modelo cliente-servidor, utilizando TypeScript. O cliente se conecta ao servidor via WebSocket, utilizando um protocolo de aplicação próprio chamado **GBTP**.
+Este projeto é um exemplo educacional para a disciplina de Redes de Computadores, demonstrando a implementação de um sistema bancário simples em rede no modelo cliente-servidor, utilizando TypeScript. O cliente se conecta ao servidor via WebSocket, utilizando um protocolo de aplicação próprio chamado **GBTP**. Este projeto contempla exclusivamente o desenvolvimento da parte back-end da aplicação, sendo o desenvolvimento do front-end de responsabilidade de outros grupos.
 
 ## ✅ Objetivo
 
@@ -76,22 +76,22 @@ export class GBTPResult {
 
   public static fromString(resultMessage: string): GBTPResult { ... }
 
-  public toString(): string {
-    return [
-      \`STATUS:\${this.status === 'OK' ? this.balance : 'ERROR'}\`,
-      \`MESSAGE:\${this.message}\`,
-      \`BALANCE:\${this.balance}\`
-    ].join('\n');
-  }
+  public toString() {
+        return [
+            `STATUS: ${this.status}`,
+            `MESSAGE: ${this.message}`,
+            `BALANCE: ${this.balance}`
+        ].join('\n');
+    }
 }
 ```
 
 **Formato da mensagem de resposta:**
 
 ```
-STATUS:<saldo atual ou ERROR>
+STATUS:<OK ou ERROR>
 MESSAGE:<mensagem descritiva>
-BALANCE:<saldo atual>
+BALANCE:<saldo atual ou -1(conta não encontrada)>
 ```
 
 ## ✅ Operações Suportadas
@@ -108,7 +108,7 @@ BALANCE:<saldo atual>
 ### Servidor
 
 ```bash
-cd gbtp-server
+cd gabio-server
 npm install
 npm run build
 npm start
@@ -134,7 +134,7 @@ VALUE:100
 ## ✅ Exemplo de Mensagem de Resposta
 
 ```
-STATUS:600
+STATUS:OK
 MESSAGE:Depósito realizado com sucesso
 BALANCE:600
 ```
