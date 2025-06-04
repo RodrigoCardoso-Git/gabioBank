@@ -44,13 +44,7 @@ export class ServerComunicador {
         ws.on('message', (data) => {
             const msg = data.toString().trim();
 
-            // Se a mensagem for vazia, fecha a conexão
-            if (msg === '') {
-                ws.close();
-                return;
-            }
-
-            // Se for uma requisição CNET
+            // Se for uma requisição GBTP
             try {
                 const requestCNET: GBTPRequest = GBTPRequest.fromString(msg);
                 const responseCNET = this.processGBTPRequest(requestCNET);
@@ -62,45 +56,59 @@ export class ServerComunicador {
         });
     }
 
-    private processGBTPRequest(request: GBTPRequest): GBTPResult{
+    private processGBTPRequest(request: GBTPRequest): GBTPResult {
         const account_id: string = request.account_id;
         const value: number = request.value;
         const operation: string = request.operation;
         const to_account_id: string | void = request.to_account_id;
         const account: Account | undefined = this.repositorio.find(account_id);
-
+    
         if (!account) {
-            return new GBTPResult ('ERROR', 'Conta de origem não encontrada', -1);
+            if (operation === 'TRANSFER') {
+                return new GBTPResult('ERROR', 'Conta de origem não encontrada', -1);
+            }
+            return new GBTPResult('ERROR', 'Conta não encontrada', -1);
         }
+    
         if (value < 0) {
-            return new GBTPResult('ERROR','Valor não pode ser negativo', account.saldo);
+            return new GBTPResult('ERROR', 'Valor não pode ser negativo', account.saldo);
         }
-
+    
         switch (operation) {
             case 'BALANCE':
                 return new GBTPResult('OK', 'Saldo consultado com sucesso', account.saldo);
+    
             case 'DEPOSIT':
                 account.deposito(value);
-                return new GBTPResult('OK', 'Depósito realizado com sucesso',account.saldo);
+                return new GBTPResult('OK', 'Depósito realizado com sucesso', account.saldo);
+    
             case 'WITHDRAW':
-                account.saque(value);
-                return new GBTPResult('OK','Saque efetuado', account.saldo);
-            case 'TRANSFER':
-                if (account.id === to_account_id) {
-                    return new GBTPResult('ERROR', 'Conta de origem e destino devem ser diferentes', -1);
+                if (value > account.saldo) {
+                    return new GBTPResult('ERROR', 'Saldo insuficiente', account.saldo);
                 }
-                if(typeof to_account_id != 'undefined') {
-                    const toAcc = this.repositorio.find(to_account_id);
-                    if (!toAcc) return new GBTPResult('ERROR', 'Conta de destino inexistente', -1);
-                    account.saque(value);
-                    toAcc.deposito(value);
-                } 
+                account.saque(value);
+                return new GBTPResult('OK', 'Saque efetuado', account.saldo);
+    
+            case 'TRANSFER':
+                if (!to_account_id) {
+                    return new GBTPResult('ERROR', 'Conta de destino não informada', account.saldo);
+                }
+                const toAcc = this.repositorio.find(to_account_id);
+                if (!toAcc) {
+                    return new GBTPResult('ERROR', 'Conta de destino inexistente', account.saldo);
+                }
+                if (value > account.saldo) {
+                    return new GBTPResult('ERROR', 'Saldo insuficiente', account.saldo);
+                }
+                account.saque(value);
+                toAcc.deposito(value);
                 return new GBTPResult('OK', 'Transferência concluída', account.saldo);
+    
             default:
                 return new GBTPResult('ERROR', 'Operação inválida', account.saldo);
         }
     }
-
+    
     private setupWebSocketCloseHandler(ws: WebSocket) {
         ws.on('close', () => {
             console.log('Cliente desconectado');
