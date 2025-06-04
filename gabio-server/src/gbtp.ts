@@ -55,9 +55,9 @@ export class GBTPResult {
 
     public static fromString(resultMessage: string): GBTPResult {
         const lines = resultMessage.trim().split('\n');
-        let balance = parseFloat(lines[0].split(':')[1].trim());
-        let status = lines[1].split(':')[1].trim();
-        let message = lines[2].split(':')[1].trim();
+        let status = lines[0].split(':')[1].trim();
+        let message = lines[1].split(':')[1].trim();
+        let balance = parseFloat(lines[2].split(':')[1].trim());
         return new GBTPResult(status, message, balance);
     }
 
@@ -72,11 +72,9 @@ export class GBTPResult {
 
     toString() {
         return [
-            `STATUS:${this.status == 'OK' ? this.balance : 'ERROR'}`,
-            `MESSAGE:${this.message}`,
-            `BALANCE:${this.balance}`
+            `STATUS: ${this.status}`,
+            `MESSAGE: ${this.message}`,
+            `BALANCE: ${this.balance}`
         ].join('\n');
     }
-
-
 }
